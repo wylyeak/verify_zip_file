@@ -51,12 +51,22 @@ Index
 
 {% block js %}
     <script type="text/javascript">
-        $().ready(function() {
+        function refresh() {
+            console.log("refresh");
             var files = $("input[name='files']");
-            console.log(files);
-            $.each(files, function(index, value){
-                console.log(index + ':' + value.value);
-            })
+            $.each(files, function (index, value) {
+                $.getJSON("/status/" + value.value, function(data){
+                    console.log(data.result.complete);
+                    console.log(data.result.verify);
+                    if (data.result.complete) {
+
+                    }
+                });
+            });
+        }
+        var ref = setInterval("refresh()", 5000);
+        $().ready(function() {
+            console.log("init")
         });
     </script>
 {% endblock %}

@@ -52,5 +52,14 @@ def detail(name):
     print name
     pass
 
+
+@app.route('/status/<name>')
+def status(name):
+    data = dict()
+    data['name'] = name
+    data['complete'] = FileUtil.is_exists(RESULT_FOLDER + FileUtil.spit_filename(name) + '.log')
+    data['verify'] = FileUtil.is_exists(WORK_FOLDER + FileUtil.spit_filename(name))
+    return jsonify(result=data)
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
