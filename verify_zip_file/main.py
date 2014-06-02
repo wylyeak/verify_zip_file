@@ -2,11 +2,14 @@
 import sys
 
 from PyQt4 import QtCore, QtGui
+from mainwindow import Ui_main_window
 
 
 class MainWindow(QtGui.QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
+        self.ui = Ui_main_window()
+        self.ui.setupUi(self)
         self.setWindowModality(QtCore.Qt.ApplicationModal)
         self.resize(640, 480)
         self.setMinimumSize(QtCore.QSize(640, 480))
