@@ -42,15 +42,35 @@ class GUIExtractFileShow(QtCore.QObject, IExtractShow):
         self.update_extract_signal.emit(kv_args)
 
 
+class MyItem(QtGui.QTreeWidgetItem):
+    def __init__(self, kv_args=None, key=None, parent=None):
+        super(MyItem, self).__init__(parent)
+        if kv_args:
+            self.kv_args = kv_args
+            self.file_path = kv_args["file_path"]
+            self.line_num = kv_args["line_num"]
+            self.line = kv_args["line"]
+            self.relative_file_path = kv_args["relative_file_path"]
+            self.matcher = kv_args["matcher"]
+        if key:
+            self.key = key
+        self.child_mapper = dict()
+        self.leaf = False
+
+    def add_child(self, q_tree_widget_item):
+        self.child_mapper[q_tree_widget_item.key] = q_tree_widget_item
+        QtGui.QTreeWidgetItem.addChild(self, q_tree_widget_item)
+
+    def get_child(self, key):
+        return self.child_mapper.get(key)
+
+
 class MainWindow(QtGui.QMainWindow, IExtractShow, IVerifyFileShow):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.ui = Ui_main_window()
         self.ui.setupUi(self)
         self.ui.retranslateUi(self)
-        self.ui.zip_path.setText(u"D:/work/pop-T-order.shop.jd.com-bjshijianwei-Zheng"
-                                 u"Chang-test-r3012_2014-05-27_16.57.37.zip")
-        self.ui.work_path.setText(unicode("D:\\work"))
         self.ui.start_button.clicked.connect(self.__start_verify)
         self.flag = False
         self.analyze_info = GUIVerifyFileShow()
@@ -60,6 +80,10 @@ class MainWindow(QtGui.QMainWindow, IExtractShow, IVerifyFileShow):
         self.extract_progress.start_extract_signal.connect(self.start_extract)
         self.extract_progress.finish_extract_signal.connect(self.finish_extract)
         self.extract_progress.update_extract_signal.connect(self.update_extract)
+        self.model = MyItem()
+        self.ui.tree_view.setColumnCount(2)
+        self.ui.tree_view.setHeaderLabels([u"文件", u"行号"])
+        self.ui.tree_view.clicked.connect(self.item_clicked)
 
     def __show_status_msg(self, msg):
         self.ui.status_bar.showMessage(unicode(msg))
@@ -72,7 +96,33 @@ class MainWindow(QtGui.QMainWindow, IExtractShow, IVerifyFileShow):
         file_path = kv_args["file_path"]
         line_num = kv_args["line_num"]
         line = kv_args["line"]
-        print "show_info", file_path, line_num, line
+        relative_file_path = kv_args["relative_file_path"]
+        matcher = kv_args["matcher"]
+        dir_nodes = list(relative_file_path.split(os.sep))
+        dir_nodes.append(str(line_num))
+        parent = self.model
+        index = 0
+        total = len(dir_nodes)
+        for dir_node in dir_nodes:
+            tmp = parent.get_child(dir_node)
+            if tmp:
+                pass
+            else:
+                if self.model == parent:
+                    tmp = MyItem(kv_args, dir_node, self.ui.tree_view)
+                    tmp.setText(0, unicode(dir_node))
+                else:
+                    tmp = MyItem(kv_args, dir_node, parent)
+                    if index + 1 == total:
+                        tmp.setText(0, parent.key)
+                        tmp.setText(1, unicode(dir_node))
+                        tmp.leaf = True
+                    else:
+                        tmp.setText(0, unicode(dir_node))
+                parent.add_child(tmp)
+            parent = tmp
+            index += 1
+        print "show_info", file_path, line_num, line, matcher, relative_file_path
 
     def start_extract(self, kv_args):
         self.ui.progress_bar.setMinimum(0)
@@ -89,6 +139,10 @@ class MainWindow(QtGui.QMainWindow, IExtractShow, IVerifyFileShow):
 
     def finish_verify(self, kv_args):
         self.flag = False
+        self.model = MyItem()
+
+    def item_clicked(self, model_index):
+        print model_index.model()
 
     def __start_verify(self):
         if not self.flag:

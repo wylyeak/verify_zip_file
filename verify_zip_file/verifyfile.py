@@ -46,8 +46,8 @@ class VerifyFile(object):
 
     def show_info(self, file_path, line_num, line, matcher):
         if self.analyze_info:
-            print file_path[len(self.work_path) - 1: -1]
-            self.analyze_info.show_info(file_path=file_path, line_num=line_num, line=line, matcher=matcher)
+            self.analyze_info.show_info(file_path=file_path, relative_file_path=file_path[len(self.work_path): -1],
+                                        line_num=line_num, line=line, matcher=matcher)
         else:
             print file_path, line_num, line, matcher
 
