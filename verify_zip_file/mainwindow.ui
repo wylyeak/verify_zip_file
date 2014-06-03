@@ -23,21 +23,18 @@
    <bool>false</bool>
   </property>
   <property name="acceptDrops">
-   <bool>true</bool>
+   <bool>false</bool>
   </property>
   <property name="windowTitle">
    <string>验证工具</string>
   </property>
-  <widget class="QWidget" name="centralwidget">
+  <widget class="QWidget" name="central_widget">
    <property name="acceptDrops">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
-     <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0">
-      <property name="spacing">
-       <number>3</number>
-      </property>
+     <layout class="QVBoxLayout" name="vertical_layout">
       <item>
        <layout class="QHBoxLayout" name="horizontal_layout">
         <item>
@@ -48,12 +45,15 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="zip_path">
+         <widget class="MyQLineEdit" name="zip_path">
           <property name="minimumSize">
            <size>
             <width>471</width>
             <height>0</height>
            </size>
+          </property>
+          <property name="acceptDrops">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -61,6 +61,9 @@
          <widget class="QLabel" name="config_path">
           <property name="cursor">
            <cursorShape>PointingHandCursor</cursorShape>
+          </property>
+          <property name="acceptDrops">
+           <bool>false</bool>
           </property>
           <property name="text">
            <string>选择config</string>
@@ -79,12 +82,15 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="work_path">
+         <widget class="MyQLineEdit" name="work_path">
           <property name="minimumSize">
            <size>
             <width>471</width>
             <height>0</height>
            </size>
+          </property>
+          <property name="acceptDrops">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -123,14 +129,28 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="acceptDrops">
+          <bool>false</bool>
+         </property>
         </widget>
+       </widget>
+      </item>
+      <item>
+       <widget class="QProgressBar" name="progress_bar">
+        <property name="value">
+         <number>0</number>
+        </property>
+        <property name="textVisible">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
      </layout>
     </item>
    </layout>
   </widget>
-  <widget class="QMenuBar" name="menu_bar">
+  <widget class="QStatusBar" name="status_bar"/>
+  <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -139,57 +159,15 @@
      <height>23</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menu">
-    <property name="title">
-     <string>文件</string>
-    </property>
-    <addaction name="paste_action"/>
-    <addaction name="separator"/>
-    <addaction name="quit_action"/>
-   </widget>
-   <addaction name="menu"/>
   </widget>
-  <widget class="QStatusBar" name="status_bar"/>
-  <action name="paste_action">
-   <property name="text">
-    <string>粘贴</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+V</string>
-   </property>
-   <property name="shortcutContext">
-    <enum>Qt::ApplicationShortcut</enum>
-   </property>
-  </action>
-  <action name="quit_action">
-   <property name="text">
-    <string>退出</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Q</string>
-   </property>
-   <property name="shortcutContext">
-    <enum>Qt::ApplicationShortcut</enum>
-   </property>
-  </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MyQLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">myqlineedit</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
- <connections>
-  <connection>
-   <sender>quit_action</sender>
-   <signal>triggered()</signal>
-   <receiver>main_window</receiver>
-   <slot>close()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>319</x>
-     <y>239</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>
