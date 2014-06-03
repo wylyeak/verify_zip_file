@@ -93,11 +93,11 @@ class MainWindow(QtGui.QMainWindow, IExtractShow, IVerifyFileShow):
         self.__show_status_msg(u"分析完成")
 
     def show_info(self, kv_args):
-        file_path = kv_args["file_path"]
+        # file_path = kv_args["file_path"]
         line_num = kv_args["line_num"]
-        line = kv_args["line"]
+        # line = kv_args["line"]
         relative_file_path = kv_args["relative_file_path"]
-        matcher = kv_args["matcher"]
+        # matcher = kv_args["matcher"]
         dir_nodes = list(relative_file_path.split(os.sep))
         dir_nodes.append(str(line_num))
         parent = self.model
@@ -109,20 +109,19 @@ class MainWindow(QtGui.QMainWindow, IExtractShow, IVerifyFileShow):
                 pass
             else:
                 if self.model == parent:
-                    tmp = MyItem(kv_args, dir_node, self.ui.tree_view)
-                    tmp.setText(0, unicode(dir_node))
+                    tmp_parent = self.ui.tree_view
                 else:
-                    tmp = MyItem(kv_args, dir_node, parent)
-                    if index + 1 == total:
-                        tmp.setText(0, parent.key)
-                        tmp.setText(1, unicode(dir_node))
-                        tmp.leaf = True
-                    else:
-                        tmp.setText(0, unicode(dir_node))
+                    tmp_parent = parent
+                tmp = MyItem(kv_args, dir_node, tmp_parent)
+                if index + 1 == total:
+                    tmp.setText(0, parent.key)
+                    tmp.setText(1, unicode(dir_node))
+                    tmp.leaf = True
+                else:
+                    tmp.setText(0, unicode(dir_node))
                 parent.add_child(tmp)
             parent = tmp
             index += 1
-        print "show_info", file_path, line_num, line, matcher, relative_file_path
 
     def start_extract(self, kv_args):
         self.ui.progress_bar.setMinimum(0)
