@@ -9,11 +9,12 @@ from util import spit_filename
 
 
 class ExtractFile(object):
-    def __init__(self, fp, work_path, regex_util=None, show_info=False):
+    def __init__(self, fp, work_path, regex_util=None, show_info=False, progress=None):
         self.fp = fp
         self.work_path = work_path
         self.zf = ZipFile(self.fp, mode="r")
         self.regex_util = regex_util
+        self.progress = progress
         self.uncompress_size = sum((f.file_size for f in self.zf.infolist()))
         self.show_info = show_info
 
@@ -26,8 +27,6 @@ class ExtractFile(object):
         members = self.zf.infolist()
         if self.show_info:
             self.start_extract()
-            # pb = ProgressBar(maxval=self.uncompress_size)
-            # pb.start()
         total = 0
         for zip_info in members:
             total += zip_info.file_size
@@ -36,40 +35,55 @@ class ExtractFile(object):
                     self.zf.extract(zip_info.filename, self.work_path)
                     if self.show_info:
                         self.update_extract(total)
-                        # pb.update(total)
                 else:
                     print "path len > 255   ", self.work_path, zip_info.filename
             else:
                 pass
-                # print zip_info.filename
         if self.show_info:
             self.finish_extract()
         self.zf.close()
 
     def start_extract(self):
-        pass
+        if self.progress:
+            self.progress.start_extract(fp=self.fp, uncompress_size=self.uncompress_size)
 
     def finish_extract(self):
-        pass
+        if self.progress:
+            self.progress.finish_extract(fp=self.fp)
 
     def update_extract(self, extract_size):
+        if self.progress:
+            self.progress.update_extract(extract_size=extract_size)
+
+
+class IExtractShow(object):
+    def __init__(self):
+        super(IExtractShow, self).__init__()
+
+    def start_extract(self, **kv_args):
+        pass
+
+    def finish_extract(self, **kv_args):
+        pass
+
+    def update_extract(self, **kv_args):
         pass
 
 
-class CliExtractFile(ExtractFile):
-    def __init__(self, fp, work_path, regex_util=None, show_info=False):
-        super(CliExtractFile, self).__init__(fp, work_path, regex_util, show_info)
+class CliExtractFile(IExtractShow):
+    def __init__(self):
+        super(CliExtractFile, self).__init__()
         self.pb = None
 
-    def start_extract(self):
-        self.pb = ProgressBar(maxval=self.uncompress_size)
+    def start_extract(self, **kv_args):
+        self.pb = ProgressBar(maxval=kv_args["uncompress_size"])
         self.pb.start()
 
-    def finish_extract(self):
+    def finish_extract(self, **kv_args):
         self.pb.finish()
 
-    def update_extract(self, extract_size):
-        self.pb.update(extract_size)
+    def update_extract(self, **kv_args):
+        self.pb.update(kv_args["extract_size"])
 
 
 

@@ -7,17 +7,19 @@ import sys
 from configparser import ConfigParser
 
 from configregexutil import ConfigRegexUtil
-from extractutil import CliExtractFile
+from extractutil import ExtractFile, CliExtractFile
 from util import spit_filename, spit_ext, parse_bool
 
 
 class VerifyFile(object):
-    def __init__(self, zip_file_path, work_path, cfg_path, show_extract_progress=False):
+    def __init__(self, zip_file_path, work_path, cfg_path, show_extract_progress=False, analyze_info=None,
+                 extract_progress=None):
         self.zip_file_path = zip_file_path
         self.work_path = work_path + os.sep + spit_filename(zip_file_path) + os.sep
         self.show_extract_progress = show_extract_progress
         self.is_extract_root = False
-        self.extract_class = CliExtractFile
+        self.extract_progress = extract_progress
+        self.analyze_info = analyze_info
         self.cf = ConfigParser()
         self.cf.read(cfg_path, encoding="UTF-8")
         self.cfg_path = cfg_path
@@ -26,7 +28,7 @@ class VerifyFile(object):
         self.search_regex = ConfigRegexUtil(self.cf, cfg_path, "search_regex")
 
     def __extract_root(self):
-        root_ef = self.extract_class(self.zip_file_path, self.work_path, self.eu_file, True)
+        root_ef = self.make_extract(self.zip_file_path, self.work_path)
         root_ef.clean_work_path()
         root_ef.extract()
 
@@ -39,11 +41,23 @@ class VerifyFile(object):
             if not self.eu_text.do_match(line):
                 res = self.search_regex.do_search(line)
                 if None != res:
-                    print line
+                    self.show_info(file_path=file_path, line_num=line_num, line=line, matcher=res)
         f.close()
+
+    def show_info(self, file_path, line_num, line, matcher):
+        if self.analyze_info:
+            print file_path[len(self.work_path) - 1: -1]
+            self.analyze_info.show_info(file_path=file_path, line_num=line_num, line=line, matcher=matcher)
+        else:
+            print file_path, line_num, line, matcher
 
     def walk(self):
         self.__walk(self.work_path)
+        if self.analyze_info:
+            self.analyze_info.finish_verify(fp=self.zip_file_path)
+
+    def make_extract(self, zip_file_path, work_path):
+        return ExtractFile(zip_file_path, work_path, self.eu_file, self.show_extract_progress, self.extract_progress)
 
     def __walk(self, file_path):
         if not self.is_extract_root:
@@ -57,7 +71,7 @@ class VerifyFile(object):
                 if ext == "jar":
                     if not self.eu_file.do_match(file_name):
                         jar_extract_path = dir_path + os.sep + spit_filename(file_name)
-                        ef = self.extract_class(abs_file_path, jar_extract_path, self.eu_file, True)
+                        ef = self.make_extract(abs_file_path, jar_extract_path)
                         ef.clean_work_path()
                         ef.extract()
                         self.__walk(jar_extract_path)
@@ -66,12 +80,23 @@ class VerifyFile(object):
                         self.analyze_file(abs_file_path)
 
 
+class IVerifyFileShow(object):
+    def __init__(self):
+        super(IVerifyFileShow, self).__init__()
+
+    def show_info(self, **kv_args):
+        pass
+
+    def finish_verify(self, **kv_args):
+        pass
+
+
 if __name__ == "__main__":
     if len(sys.argv) == 5:
         zipfile = sys.argv[1]
         path = sys.argv[2]
         cfg_name = sys.argv[3]
-        vf = VerifyFile(zipfile, path, cfg_name, parse_bool(sys.argv[4]))
+        vf = VerifyFile(zipfile, path, cfg_name, parse_bool(sys.argv[4]), extract_progress=CliExtractFile())
         vf.walk()
     else:
         print "param1: zip_path", "param2: extract_path", "param3:config.ini path",
