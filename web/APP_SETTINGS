@@ -1,2 +1,2 @@
-UPLOAD_FOLDER = /tmp/
-WORK_FOLDER = /tmp/
+UPLOAD_FOLDER = /tmp/verify/
+WORK_FOLDER = /tmp//verify_work/
