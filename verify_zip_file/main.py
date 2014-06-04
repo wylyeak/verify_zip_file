@@ -77,9 +77,6 @@ class MainWindow(QtGui.QMainWindow, IExtractShow, IVerifyFileShow):
         self.ui.setupUi(self)
         self.ui.retranslateUi(self)
         self.ui.start_button.clicked.connect(self.__start_verify)
-        self.ui.zip_path.setText(u"D:/work/pop-T-order.shop.jd.com-bjshijianwei-Zheng"
-                                 u"Chang-test-r3012_2014-05-27_16.57.37.zip")
-        self.ui.work_path.setText(unicode("D:\\work"))
         self.flag = False
         self.analyze_info = GUIVerifyFileShow()
         self.analyze_info.show_info_signal.connect(self.show_info)
