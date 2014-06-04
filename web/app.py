@@ -6,6 +6,7 @@ import fileUtil
 from flask import Flask, request, session, g, redirect, url_for, \
      abort, render_template, flash, jsonify
 from werkzeug.utils import secure_filename
+from verify_zip_file import verifyfile
 
 ALLOWED_EXTENSIONS = set(['zip', 'war'])
 UPLOAD_FOLDER = '/export/data/verify/upload/'
@@ -25,7 +26,6 @@ def allowed_file(file_name):
 
 @app.route('/')
 def index():
-    # print app.config['UPLOAD_FOLDER']
     f = fileUtil.get_all_file(app.config['UPLOAD_FOLDER'])
     return render_template('index.html', files=f)
 
@@ -39,5 +39,19 @@ def upload():
             f.save(os.path.join(app.config['UPLOAD_FOLDER'], file_name))
     return redirect(url_for('index'))
 
+
+@app.route('/verify/<name>')
+def verify(name):
+    print name
+    vf = verifyfile.VerifyFile(UPLOAD_FOLDER + name, WORK_FOLDER, 'config.ini', True)
+    vf.walk()
+    return jsonify(name=name)
+
+
+@app.route('/detail/<name>')
+def detail(name):
+    print name
+    pass
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
