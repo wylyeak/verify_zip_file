@@ -5,13 +5,44 @@ Index
 {% block body %}
 <div class="container">
 
-    <div class="starter-template">
-        <h1>Upload Files</h1>
-        <ul class="files">
-        {% for f in files %}
-            <li><a href="/detail?name={{ f }}">{{ f }}</a></li>
-        {% endfor %}
-        </ul>
+    <div class="bs-container">
+        <div class="table-responsive">
+            <h3>Upload Files</h3>
+            <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>File Name</th>
+                <th>Status</th>
+                <th>Log</th>
+                <th>Operate</th>
+            </tr>
+            </thead>
+                <tbody>
+                    {% for f in files %}
+                <tr id="{{ f }}">
+                    <td><a href="/detail?name={{ f }}">{{ f }}</a></td>
+                    <td>
+                        <div class="progress progress-striped active">
+                          <div class="progress-bar"  role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 45%">
+                            <span class="sr-only">45% Complete</span>
+                          </div>
+                        </div>
+                    </td>
+                    <td>日志路径</td>
+                    <td>分析 删除</td>
+                </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <form action="/upload" method="post" class="form-inline" role="form" enctype="multipart/form-data">
+                        <td colspan="3"><input type="file" name="file"></td>
+                        <td colspan="1"><input type="submit" class="btn btn-sm" value="Upload"></td>
+                        </form>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
     </div>
 
 </div><!-- /.container -->

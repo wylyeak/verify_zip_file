@@ -5,14 +5,23 @@ import fileUtil
 
 from flask import Flask, request, session, g, redirect, url_for, \
      abort, render_template, flash, jsonify
+from werkzeug.utils import secure_filename
 
-ALLOWED_EXTENSIONS = set(['zip', 'pdf'])
-UPLOAD_FOLDER = '/tmp/verify/'
-WORK_FOLDER = '/tmp/verify_work/'
+ALLOWED_EXTENSIONS = set(['zip', 'war'])
+UPLOAD_FOLDER = '/export/data/verify/upload/'
+WORK_FOLDER = '/export/data/verify/work/'
+LOG_FOLDER = '/export/data/verify/log/'
+RESULT_FOLDER = '/export/data/verify/result/'
 
 app = Flask(__name__)
 #app.config.from_envvar('APP_SETTINGS', silent=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+
+def allowed_file(file_name):
+    return '.' in file_name and \
+           file_name.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+
 
 @app.route('/')
 def index():
@@ -23,8 +32,12 @@ def index():
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
-
-    pass
+    if request.method == 'POST':
+        f = request.files['file']
+        if f and allowed_file(f.filename):
+            file_name = secure_filename(f.filename)
+            f.save(os.path.join(app.config['UPLOAD_FOLDER'], file_name))
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run(debug=True)
