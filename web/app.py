@@ -1,12 +1,11 @@
 __author__ = 'jervyshi'
 import os
 
-import fileUtil
-
 from flask import Flask, request, session, g, redirect, url_for, \
      abort, render_template, flash, jsonify
 from werkzeug.utils import secure_filename
 from verify_zip_file import verifyfile
+from fileUtil import FileUtil
 
 ALLOWED_EXTENSIONS = set(['zip', 'war'])
 UPLOAD_FOLDER = '/export/data/verify/upload/'
@@ -26,7 +25,7 @@ def allowed_file(file_name):
 
 @app.route('/')
 def index():
-    f = fileUtil.get_all_file(app.config['UPLOAD_FOLDER'])
+    f = FileUtil.get_all_file(app.config['UPLOAD_FOLDER'])
     return render_template('index.html', files=f)
 
 
