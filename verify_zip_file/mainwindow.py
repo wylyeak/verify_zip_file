@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow.ui'
 #
-# Created: Tue Jun 03 10:46:23 2014
+# Created: Wed Jun 04 11:01:14 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -83,7 +83,7 @@ class Ui_main_window(object):
         sizePolicy.setHeightForWidth(self.tree_view.sizePolicy().hasHeightForWidth())
         self.tree_view.setSizePolicy(sizePolicy)
         self.tree_view.setObjectName(_fromUtf8("tree_view"))
-        self.text_view = QtGui.QTextBrowser(self.splitter)
+        self.text_view = MyQTextBrowser(self.splitter)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -117,4 +117,5 @@ class Ui_main_window(object):
         self.work_path_label.setText(_translate("main_window", "WorkPath:", None))
         self.start_button.setText(_translate("main_window", "Start", None))
 
+from myqtextbrowser import MyQTextBrowser
 from myqlineedit import MyQLineEdit

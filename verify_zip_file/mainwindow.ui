@@ -122,7 +122,7 @@
           </sizepolicy>
          </property>
         </widget>
-        <widget class="QTextBrowser" name="text_view">
+        <widget class="MyQTextBrowser" name="text_view">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
            <horstretch>0</horstretch>
@@ -166,6 +166,11 @@
    <class>MyQLineEdit</class>
    <extends>QLineEdit</extends>
    <header location="global">myqlineedit</header>
+  </customwidget>
+    <customwidget>
+   <class>MyQTextBrowser</class>
+   <extends>QTextBrowser</extends>
+   <header location="global">myqtextbrowser</header>
   </customwidget>
  </customwidgets>
  <resources/>
