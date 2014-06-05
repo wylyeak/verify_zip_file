@@ -8,6 +8,7 @@ from mainwindow import Ui_main_window
 from extractutil import IExtractShow
 from verifyfile import VerifyFile, IVerifyFileShow
 from util import *
+from setting import *
 
 
 class GUIVerifyFileShow(QtCore.QObject, IVerifyFileShow):
@@ -57,9 +58,14 @@ class MyItem(QtGui.QTreeWidgetItem):
         self.child_mapper = dict()
         self.leaf = False
 
+    def get_children(self):
+        return list(self.child_mapper.values())
+
+    def clear(self):
+        self.child_mapper = dict()
+
     def add_child(self, q_tree_widget_item):
         self.child_mapper[q_tree_widget_item.key] = q_tree_widget_item
-        QtGui.QTreeWidgetItem.addChild(self, q_tree_widget_item)
 
     def get_child(self, key):
         return self.child_mapper.get(key)
@@ -73,6 +79,7 @@ class MainWindow(QtGui.QMainWindow, IExtractShow, IVerifyFileShow):
         self.ui.retranslateUi(self)
         self.ui.start_button.clicked.connect(self.__start_verify)
         self.flag = False
+        self.vf = None
         self.analyze_info = GUIVerifyFileShow()
         self.analyze_info.show_info_signal.connect(self.show_info)
         self.analyze_info.finish_verify_signal.connect(self.finish_verify)
@@ -80,24 +87,55 @@ class MainWindow(QtGui.QMainWindow, IExtractShow, IVerifyFileShow):
         self.extract_progress.start_extract_signal.connect(self.start_extract)
         self.extract_progress.finish_extract_signal.connect(self.finish_extract)
         self.extract_progress.update_extract_signal.connect(self.update_extract)
+        self.ui.zip_path.textChanged.connect(self.text_changed)
         self.model = MyItem()
-        self.ui.tree_view.setColumnCount(2)
-        self.ui.tree_view.setHeaderLabels([u"文件", u"行号"])
-        self.ui.tree_view.clicked.connect(self.item_clicked)
+        self.ui.tree_view.itemSelectionChanged.connect(self.item_selected)
+        exclude_file_action = QtGui.QAction(u"排除文件", self.ui.tree_view)
+        exclude_file_action.triggered.connect(self.exclude_file)
+        self.ui.tree_view.addAction(exclude_file_action)
+        exclude_txt_action = QtGui.QAction(u"排除字符", self.ui.tree_view)
+        exclude_txt_action.triggered.connect(self.exclude_txt)
+        self.ui.tree_view.addAction(exclude_txt_action)
+        self.setting = None
+        self.config_path = None
+        self.__init_settings()
+
+    def text_changed(self, text):
+        if self.ui.work_path.text() == text:
+            pass
+        else:
+            text = unicode(text)
+            if os.path.isfile(text):
+                config_path = self.setting.get_file_config_path(spit_filename(text, True))
+                if config_path:
+                    self.__set_config_path(config_path)
+                else:
+                    pass
+            else:
+                pass
+            pass
+
+    def __set_config_path(self, config_path):
+        if config_path and os.path.isfile(config_path):
+            self.ui.config_path.setText(spit_filename(config_path, True))
+            self.config_path = config_path
+            self.__show_status_msg(u"配置文件已自动加载为：" + spit_filename(config_path, True))
+        else:
+            self.__show_status_msg(config_path + u"不存在")
+            self.__set_config_path(self.setting.get_default_config())
+
+    def __init_settings(self):
+        if os.path.isfile("setting.ini"):
+            self.setting = Setting("setting.ini")
+            self.ui.work_path.setText(unicode(self.setting.get_work_path()))
+            self.__set_config_path(self.setting.get_default_config())
 
     def __show_status_msg(self, msg):
         self.ui.status_bar.showMessage(unicode(msg))
 
-    def finish_walk(self):
-        self.flag = False
-        self.__show_status_msg(u"分析完成")
-
     def show_info(self, kv_args):
-        # file_path = kv_args["file_path"]
         line_num = kv_args["line_num"]
-        # line = kv_args["line"]
         relative_file_path = kv_args["relative_file_path"]
-        # matcher = kv_args["matcher"]
         dir_nodes = list(relative_file_path.split(os.sep))
         dir_nodes.append(str(line_num))
         parent = self.model
@@ -116,9 +154,10 @@ class MainWindow(QtGui.QMainWindow, IExtractShow, IVerifyFileShow):
                 if index + 1 == total:
                     tmp.setText(0, parent.key)
                     tmp.setText(1, unicode(dir_node))
-                    tmp.leaf = True
                 else:
                     tmp.setText(0, unicode(dir_node))
+                if index + 2 >= total:
+                    tmp.leaf = True
                 parent.add_child(tmp)
             parent = tmp
             index += 1
@@ -139,22 +178,54 @@ class MainWindow(QtGui.QMainWindow, IExtractShow, IVerifyFileShow):
     def finish_verify(self, kv_args):
         self.flag = False
         self.model = MyItem()
+        self.__show_status_msg(u"文件分析完成")
 
-    def item_clicked(self, model_index):
-        print model_index.model()
+    def exclude_file(self):
+        item = self.ui.tree_view.currentItem()
+        text = ""
+        if item and item.leaf:
+            text = spit_filename(item.file_path, True)
+        text, ok = self.__make_input_dialog(u"排除文件", u"正则表达式写法", text)
+        print text, ok
+
+    def exclude_txt(self):
+        item = self.ui.tree_view.currentItem()
+        text = ""
+        if item and item.leaf:
+            text = item.matcher
+        text, ok = self.__make_input_dialog(u"排除字符", u"正则表达式写法", text)
+        print text, ok
+
+    def __make_input_dialog(self, title, tip, default):
+        dialog = QtGui.QInputDialog(self.ui.central_widget)
+        dialog.setInputMode(QtGui.QInputDialog.TextInput)
+        dialog.setLabelText(tip)
+        dialog.resize(350, 127)
+        dialog.setWindowTitle(title)
+        dialog.setTextValue(default)
+        ok = dialog.exec_()
+        text = dialog.textValue()
+        return tuple([text, ok])
+
+    def item_selected(self):
+        item = self.ui.tree_view.currentItem()
+        if item and item.leaf:
+            self.ui.text_view.select_anchor(item)
+
+    def __validate(self):
+        self.ui
+        return True
 
     def __start_verify(self):
         if not self.flag:
-            if os.path.isfile(str(self.ui.zip_path.text())):
+            if self.__validate():
                 self.flag = True
-                vf = VerifyFile(str(self.ui.zip_path.text()), str(self.ui.work_path.text()), "config.ini", True,
-                                self.analyze_info, self.extract_progress)
-                thread = Thread(target=vf.walk)
+                self.ui.tree_view.clear()
+                self.vf = VerifyFile(str(self.ui.zip_path.text()), str(self.ui.work_path.text()), "config.ini", True,
+                                     self.analyze_info, self.extract_progress)
+                thread = Thread(target=self.vf.walk)
                 thread.setDaemon(True)
                 thread.start()
-            else:
-                print "path is"
-                # self.flag = False
         else:
             self.__show_status_msg(u"正在工作中， 请稍后")
             pass

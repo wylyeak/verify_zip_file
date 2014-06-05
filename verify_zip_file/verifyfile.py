@@ -4,15 +4,14 @@
 import os
 import sys
 
-from configparser import ConfigParser
-
 from configregexutil import ConfigRegexUtil
 from extractutil import ExtractFile, CliExtractFile
 from util import spit_filename, spit_ext, parse_bool
+from myconfigparser import MyConfigParser
 
 
 class VerifyFile(object):
-    def __init__(self, zip_file_path, work_path, cfg_path, show_extract_progress=False, analyze_info=None,
+    def __init__(self, zip_file_path, work_path, config_path, show_extract_progress=False, analyze_info=None,
                  extract_progress=None):
         self.zip_file_path = zip_file_path
         self.work_path = work_path + os.sep + spit_filename(zip_file_path) + os.sep
@@ -20,12 +19,10 @@ class VerifyFile(object):
         self.is_extract_root = False
         self.extract_progress = extract_progress
         self.analyze_info = analyze_info
-        self.cf = ConfigParser()
-        self.cf.read(cfg_path, encoding="UTF-8")
-        self.cfg_path = cfg_path
-        self.eu_file = ConfigRegexUtil(self.cf, cfg_path, "exclude_file")
-        self.eu_text = ConfigRegexUtil(self.cf, cfg_path, "exclude_txt")
-        self.search_regex = ConfigRegexUtil(self.cf, cfg_path, "search_regex")
+        self.cf = MyConfigParser(config_path, encoding="UTF-8")
+        self.eu_file = ConfigRegexUtil(self.cf, "exclude_file")
+        self.eu_text = ConfigRegexUtil(self.cf, "exclude_txt")
+        self.search_regex = ConfigRegexUtil(self.cf, "search_regex")
 
     def __extract_root(self):
         root_ef = self.make_extract(self.zip_file_path, self.work_path)

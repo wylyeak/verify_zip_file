@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow.ui'
 #
-# Created: Tue Jun 03 10:46:23 2014
+# Created: Thu Jun 05 18:06:36 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -74,22 +74,25 @@ class Ui_main_window(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.splitter.sizePolicy().hasHeightForWidth())
         self.splitter.setSizePolicy(sizePolicy)
+        self.splitter.setLineWidth(0)
+        self.splitter.setMidLineWidth(0)
         self.splitter.setOrientation(QtCore.Qt.Horizontal)
+        self.splitter.setHandleWidth(5)
+        self.splitter.setChildrenCollapsible(True)
         self.splitter.setObjectName(_fromUtf8("splitter"))
-        self.tree_view = QtGui.QTreeWidget(self.splitter)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.MinimumExpanding)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.tree_view.sizePolicy().hasHeightForWidth())
-        self.tree_view.setSizePolicy(sizePolicy)
+        self.tree_view = MyQTreeWidget(self.splitter)
+        self.tree_view.setEnabled(True)
+        self.tree_view.setContextMenuPolicy(QtCore.Qt.ActionsContextMenu)
         self.tree_view.setObjectName(_fromUtf8("tree_view"))
-        self.text_view = QtGui.QTextBrowser(self.splitter)
+        self.text_view = MyQTextBrowser(self.splitter)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.text_view.sizePolicy().hasHeightForWidth())
         self.text_view.setSizePolicy(sizePolicy)
         self.text_view.setAcceptDrops(False)
+        self.text_view.setOpenExternalLinks(True)
+        self.text_view.setOpenLinks(True)
         self.text_view.setObjectName(_fromUtf8("text_view"))
         self.vertical_layout.addWidget(self.splitter)
         self.progress_bar = QtGui.QProgressBar(self.central_widget)
@@ -116,5 +119,9 @@ class Ui_main_window(object):
         self.config_path.setText(_translate("main_window", "选择config", None))
         self.work_path_label.setText(_translate("main_window", "WorkPath:", None))
         self.start_button.setText(_translate("main_window", "Start", None))
+        self.tree_view.headerItem().setText(0, _translate("main_window", "文件", None))
+        self.tree_view.headerItem().setText(1, _translate("main_window", "行号", None))
 
+from myqtextbrowser import MyQTextBrowser
 from myqlineedit import MyQLineEdit
+from myqtreewidget import MyQTreeWidget
