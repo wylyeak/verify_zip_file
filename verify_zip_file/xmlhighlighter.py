@@ -18,26 +18,27 @@ class XMLHighlighter(QtGui.QSyntaxHighlighter):
 
         xml_element_format = QtGui.QTextCharFormat()
         xml_element_format.setFontWeight(QtGui.QFont.Bold)
-        xml_element_format.setForeground(QtCore.Qt.green)
-        self.highlighting_rules.append((QtCore.QRegExp("\\b[A-Za-z0-9_]+(?=[\s/>])"), xml_element_format))
+        xml_element_format.setForeground(QtCore.Qt.blue)
+        self.highlighting_rules.append((QtCore.QRegExp("\\b[A-Za-z0-9_-]+(?=[\s/>])"), xml_element_format))
 
         xml_attribute_format = QtGui.QTextCharFormat()
         xml_attribute_format.setFontItalic(True)
-        xml_attribute_format.setForeground(QtCore.Qt.blue)
+        xml_attribute_format.setForeground(QtCore.Qt.red)
         self.highlighting_rules.append((QtCore.QRegExp("\\b[A-Za-z0-9_]+(?=\\=)"), xml_attribute_format))
 
         self.value_format = QtGui.QTextCharFormat()
-        self.value_format.setForeground(QtCore.Qt.red)
+        self.value_format.setForeground(QtCore.Qt.darkBlue)
 
         self.value_start_expression = QtCore.QRegExp("\"")
         self.value_end_expression = QtCore.QRegExp("\"(?=[\s></])")
 
         single_line_comment_format = QtGui.QTextCharFormat()
         single_line_comment_format.setForeground(QtCore.Qt.gray)
-        self.highlighting_rules.append((QtCore.QRegExp("<!--[^\n]*-->"), single_line_comment_format))
+        self.highlighting_rules.append((QtCore.QRegExp("<!--\s*[^#]*\s*-->"), single_line_comment_format))
 
     def highlightBlock(self, text):
         #for every pattern
+        # print self.highlighting_rules
         for pattern, _format in self.highlighting_rules:
             expression = QtCore.QRegExp(pattern)
 

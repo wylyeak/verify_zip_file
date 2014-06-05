@@ -78,6 +78,7 @@ class MainWindow(QtGui.QMainWindow, IExtractShow, IVerifyFileShow):
         self.ui.retranslateUi(self)
         self.ui.start_button.clicked.connect(self.__start_verify)
         self.flag = False
+        self.vf = None
         self.analyze_info = GUIVerifyFileShow()
         self.analyze_info.show_info_signal.connect(self.show_info)
         self.analyze_info.finish_verify_signal.connect(self.finish_verify)
@@ -86,9 +87,18 @@ class MainWindow(QtGui.QMainWindow, IExtractShow, IVerifyFileShow):
         self.extract_progress.finish_extract_signal.connect(self.finish_extract)
         self.extract_progress.update_extract_signal.connect(self.update_extract)
         self.model = MyItem()
-        self.ui.tree_view.setColumnCount(2)
-        self.ui.tree_view.setHeaderLabels([u"文件", u"行号"])
-        self.ui.tree_view.itemClicked.connect(self.item_clicked)
+        self.ui.tree_view.itemSelectionChanged.connect(self.item_selected)
+        exclude_file_action = QtGui.QAction(u"排除文件", self.ui.tree_view)
+        exclude_file_action.triggered.connect(self.exclude_file)
+        self.ui.tree_view.addAction(exclude_file_action)
+        exclude_txt_action = QtGui.QAction(u"排除字符", self.ui.tree_view)
+        exclude_txt_action.triggered.connect(self.exclude_txt)
+        self.ui.tree_view.addAction(exclude_txt_action)
+        self.__init_settings()
+
+    def __init_settings(self):
+        if os.path.isfile("setting.ini"):
+            pass
 
     def __show_status_msg(self, msg):
         self.ui.status_bar.showMessage(unicode(msg))
@@ -138,24 +148,54 @@ class MainWindow(QtGui.QMainWindow, IExtractShow, IVerifyFileShow):
     def finish_verify(self, kv_args):
         self.flag = False
         self.model = MyItem()
+        self.__show_status_msg(u"文件分析完成")
 
-    def item_clicked(self, item, column):
-        if item.leaf:
+    def exclude_file(self):
+        item = self.ui.tree_view.currentItem()
+        text = ""
+        if item and item.leaf:
+            text = spit_filename(item.file_path, True)
+        text, ok = self.__make_input_dialog(u"排除文件", u"正则表达式写法", text)
+        print text, ok
+
+    def exclude_txt(self):
+        item = self.ui.tree_view.currentItem()
+        text = ""
+        if item and item.leaf:
+            text = item.matcher
+        text, ok = self.__make_input_dialog(u"排除字符", u"正则表达式写法", text)
+        print text, ok
+
+    def __make_input_dialog(self, title, tip, default):
+        dialog = QtGui.QInputDialog(self.ui.central_widget)
+        dialog.setInputMode(QtGui.QInputDialog.TextInput)
+        dialog.setLabelText(tip)
+        dialog.resize(350, 127)
+        dialog.setWindowTitle(title)
+        dialog.setTextValue(default)
+        ok = dialog.exec_()
+        text = dialog.textValue()
+        return tuple([text, ok])
+
+    def item_selected(self):
+        item = self.ui.tree_view.currentItem()
+        if item and item.leaf:
             self.ui.text_view.select_anchor(item)
+
+    def __validate(self):
+        self.ui
+        return True
 
     def __start_verify(self):
         if not self.flag:
-            if os.path.isfile(str(self.ui.zip_path.text())):
+            if self.__validate():
                 self.flag = True
                 self.ui.tree_view.clear()
-                vf = VerifyFile(str(self.ui.zip_path.text()), str(self.ui.work_path.text()), "config.ini", True,
-                                self.analyze_info, self.extract_progress)
-                thread = Thread(target=vf.walk)
+                self.vf = VerifyFile(str(self.ui.zip_path.text()), str(self.ui.work_path.text()), "config.ini", True,
+                                     self.analyze_info, self.extract_progress)
+                thread = Thread(target=self.vf.walk)
                 thread.setDaemon(True)
                 thread.start()
-            else:
-                print "path is"
-                # self.flag = False
         else:
             self.__show_status_msg(u"正在工作中， 请稍后")
             pass

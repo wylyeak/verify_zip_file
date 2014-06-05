@@ -111,16 +111,38 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="lineWidth">
+         <number>0</number>
+        </property>
+        <property name="midLineWidth">
+         <number>0</number>
+        </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <widget class="QTreeWidget" name="tree_view">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
+        <property name="handleWidth">
+         <number>5</number>
+        </property>
+        <property name="childrenCollapsible">
+         <bool>true</bool>
+        </property>
+        <widget class="MyQTreeWidget" name="tree_view">
+         <property name="enabled">
+          <bool>true</bool>
          </property>
+         <property name="contextMenuPolicy">
+          <enum>Qt::ActionsContextMenu</enum>
+         </property>
+         <column>
+          <property name="text">
+           <string>文件</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>行号</string>
+          </property>
+         </column>
         </widget>
         <widget class="MyQTextBrowser" name="text_view">
          <property name="sizePolicy">
@@ -165,12 +187,17 @@
   <customwidget>
    <class>MyQLineEdit</class>
    <extends>QLineEdit</extends>
-   <header location="global">myqlineedit</header>
+   <header>myqlineedit</header>
   </customwidget>
-    <customwidget>
+  <customwidget>
    <class>MyQTextBrowser</class>
    <extends>QTextBrowser</extends>
-   <header location="global">myqtextbrowser</header>
+   <header>myqtextbrowser</header>
+  </customwidget>
+  <customwidget>
+   <class>MyQTreeWidget</class>
+   <extends>QTreeWidget</extends>
+   <header location="global">myqtreewidget</header>
   </customwidget>
  </customwidgets>
  <resources/>
