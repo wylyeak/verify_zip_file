@@ -1,10 +1,16 @@
 from myconfigparser import MyConfigParser
 
 
-class Settings(object):
+class Setting(object):
     def __init__(self, cfg_path):
-        super(Settings, self).__init__()
+        super(Setting, self).__init__()
         self.cf = MyConfigParser(cfg_path)
+
+    def get_default_config(self):
+        return self.cf["basic"]["default_config"]
+
+    def get_work_path(self):
+        return self.cf["basic"]["work_path"]
 
     def get_file_config_path(self, file_name):
         for name in self.cf["file_config_mapper"]:
@@ -23,7 +29,7 @@ class Settings(object):
 
 
 if __name__ == "__main__":
-    settings = Settings("setting.ini")
+    settings = Setting("setting.ini")
     assert None == settings.get_file_config_path("123123123-www.google.com.hk-2123123123.zip")
     settings.set_config_mapper("www.google.com.hk", "config1.ini")
     assert "config1.ini" == settings.get_file_config_path("123123123-www.google.com.hk-2123123123.zip")

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow.ui'
 #
-# Created: Thu Jun 05 11:35:26 2014
+# Created: Thu Jun 05 18:06:36 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -91,6 +91,8 @@ class Ui_main_window(object):
         sizePolicy.setHeightForWidth(self.text_view.sizePolicy().hasHeightForWidth())
         self.text_view.setSizePolicy(sizePolicy)
         self.text_view.setAcceptDrops(False)
+        self.text_view.setOpenExternalLinks(True)
+        self.text_view.setOpenLinks(True)
         self.text_view.setObjectName(_fromUtf8("text_view"))
         self.vertical_layout.addWidget(self.splitter)
         self.progress_bar = QtGui.QProgressBar(self.central_widget)

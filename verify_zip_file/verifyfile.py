@@ -11,7 +11,7 @@ from myconfigparser import MyConfigParser
 
 
 class VerifyFile(object):
-    def __init__(self, zip_file_path, work_path, cfg_obj, show_extract_progress=False, analyze_info=None,
+    def __init__(self, zip_file_path, work_path, config_path, show_extract_progress=False, analyze_info=None,
                  extract_progress=None):
         self.zip_file_path = zip_file_path
         self.work_path = work_path + os.sep + spit_filename(zip_file_path) + os.sep
@@ -19,10 +19,7 @@ class VerifyFile(object):
         self.is_extract_root = False
         self.extract_progress = extract_progress
         self.analyze_info = analyze_info
-        if isinstance(cfg_obj, str):
-            self.cf = MyConfigParser(cfg_obj, encoding="UTF-8")
-        elif isinstance(cfg_obj, MyConfigParser):
-            self.cf = cfg_obj
+        self.cf = MyConfigParser(config_path, encoding="UTF-8")
         self.eu_file = ConfigRegexUtil(self.cf, "exclude_file")
         self.eu_text = ConfigRegexUtil(self.cf, "exclude_txt")
         self.search_regex = ConfigRegexUtil(self.cf, "search_regex")

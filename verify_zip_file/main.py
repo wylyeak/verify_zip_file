@@ -8,6 +8,7 @@ from mainwindow import Ui_main_window
 from extractutil import IExtractShow
 from verifyfile import VerifyFile, IVerifyFileShow
 from util import *
+from setting import *
 
 
 class GUIVerifyFileShow(QtCore.QObject, IVerifyFileShow):
@@ -86,6 +87,7 @@ class MainWindow(QtGui.QMainWindow, IExtractShow, IVerifyFileShow):
         self.extract_progress.start_extract_signal.connect(self.start_extract)
         self.extract_progress.finish_extract_signal.connect(self.finish_extract)
         self.extract_progress.update_extract_signal.connect(self.update_extract)
+        self.ui.zip_path.textChanged.connect(self.text_changed)
         self.model = MyItem()
         self.ui.tree_view.itemSelectionChanged.connect(self.item_selected)
         exclude_file_action = QtGui.QAction(u"排除文件", self.ui.tree_view)
@@ -94,11 +96,39 @@ class MainWindow(QtGui.QMainWindow, IExtractShow, IVerifyFileShow):
         exclude_txt_action = QtGui.QAction(u"排除字符", self.ui.tree_view)
         exclude_txt_action.triggered.connect(self.exclude_txt)
         self.ui.tree_view.addAction(exclude_txt_action)
+        self.setting = None
+        self.config_path = None
         self.__init_settings()
+
+    def text_changed(self, text):
+        if self.ui.work_path.text() == text:
+            pass
+        else:
+            text = unicode(text)
+            if os.path.isfile(text):
+                config_path = self.setting.get_file_config_path(spit_filename(text, True))
+                if config_path:
+                    self.__set_config_path(config_path)
+                else:
+                    pass
+            else:
+                pass
+            pass
+
+    def __set_config_path(self, config_path):
+        if config_path and os.path.isfile(config_path):
+            self.ui.config_path.setText(spit_filename(config_path, True))
+            self.config_path = config_path
+            self.__show_status_msg(u"配置文件已自动加载为：" + spit_filename(config_path, True))
+        else:
+            self.__show_status_msg(config_path + u"不存在")
+            self.__set_config_path(self.setting.get_default_config())
 
     def __init_settings(self):
         if os.path.isfile("setting.ini"):
-            pass
+            self.setting = Setting("setting.ini")
+            self.ui.work_path.setText(unicode(self.setting.get_work_path()))
+            self.__set_config_path(self.setting.get_default_config())
 
     def __show_status_msg(self, msg):
         self.ui.status_bar.showMessage(unicode(msg))

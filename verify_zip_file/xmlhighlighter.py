@@ -37,8 +37,23 @@ class XMLHighlighter(QtGui.QSyntaxHighlighter):
         self.highlighting_rules.append((QtCore.QRegExp("<!--\s*[^#]*\s*-->"), single_line_comment_format))
 
     def highlightBlock(self, text):
+        #----------------------
+        expression = QtCore.QRegExp("^.+$")
+        line_num = 1
+        index = expression.indexIn(text)
+        while index >= 0:
+            length = expression.matchedLength()
+            print text[index:index + length]
+            line_num_format = QtGui.QTextCharFormat()
+            line_num_format.setAnchor(True)
+            line_num_format.setAnchorHref("#page_" + str(line_num))
+            line_num_format.setAnchorName("#page_" + str(line_num))
+            self.setFormat(index, length, line_num_format)
+            index = expression.indexIn(text, index + length)
+            line_num += 1
+        #----------------------
+
         #for every pattern
-        # print self.highlighting_rules
         for pattern, _format in self.highlighting_rules:
             expression = QtCore.QRegExp(pattern)
 
