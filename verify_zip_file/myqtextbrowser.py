@@ -17,7 +17,6 @@ class MyQTextBrowser(QtGui.QTextBrowser):
     def select_anchor(self, item):
         if self.fp != item.file_path:
             self.fp = item.file_path
-            # self.scrollToAnchor("#page_" + item.line_num)
             self.__open_file()
 
     def __open_file(self):

@@ -140,7 +140,6 @@ class MainWindow(QtGui.QMainWindow, IExtractShow, IVerifyFileShow):
     def show_info(self, kv_args):
         line_num = kv_args["line_num"]
         relative_file_path = kv_args["relative_file_path"]
-        print relative_file_path
         dir_nodes = list(relative_file_path.split(os.sep))
         dir_nodes.append(str(line_num))
         parent = self.model
