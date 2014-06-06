@@ -1,5 +1,5 @@
 # coding=UTF-8
-from time import time
+from time import *
 import re
 
 from myconfigparser import MyConfigParser
@@ -14,11 +14,26 @@ class ConfigRegexUtil(object):
             cf[section] = {}
         self.__make_regex()
 
-    def add_regex(self, regex):
-        key = self.section + "_" + str(int(time()))
-        self.cf[self.section][key] = regex
-        self.__save_config()
-        self.__make_regex()
+    def add_regex(self, regex_s):
+        flag = False
+        if isinstance(regex_s, str):
+            regex_s = [regex_s]
+        for regex in regex_s:
+            if not self.has_regex(regex):
+                flag = True
+                key = self.section + "_" + str(time())
+                self.cf[self.section][key] = regex
+                sleep(0.1)
+                print key, regex
+        if flag:
+            self.__save_config()
+            self.__make_regex()
+
+    def has_regex(self, regex):
+        for value in self.cf[self.section].values():
+            if value == regex:
+                return True
+        return False
 
     def show_items(self):
         for key in self.cf[self.section]:
@@ -26,8 +41,7 @@ class ConfigRegexUtil(object):
             print key, value
 
     def del_regex(self, regex):
-        for key in self.cf[self.section]:
-            value = self.cf[self.section][key]
+        for key, value in self.cf[self.section].items():
             if value == regex:
                 del self.cf[self.section][key]
                 self.__save_config()
@@ -40,8 +54,7 @@ class ConfigRegexUtil(object):
         line_num = 0
         regex_str = ""
         self.regex_list = list()
-        for key in self.cf[self.section]:
-            value = self.cf[self.section][key]
+        for key, value in self.cf[self.section].items():
             if line_num % 99 == 0:
                 if regex_str != "":
                     self.regex_list.insert(line_num // 99, re.compile(regex_str))
@@ -69,7 +82,6 @@ class ConfigRegexUtil(object):
 
 if __name__ == "__main__":
     cf = MyConfigParser("config.ini", encoding="UTF-8")
-
     eu_file = ConfigRegexUtil(cf, "exclude_file")
     eu_text = ConfigRegexUtil(cf, "exclude_txt")
     search_regex = ConfigRegexUtil(cf, "search_regex")

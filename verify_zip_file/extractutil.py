@@ -6,10 +6,11 @@ import os
 from progressbar import ProgressBar
 
 from util import spit_filename
+from myconfigparser import MyConfigParser
 
 
 class ExtractFile(object):
-    def __init__(self, fp, work_path, regex_util=None, show_info=False, progress=None):
+    def __init__(self, fp, work_path, regex_util=None, show_info=False, progress=None, eu_text=None):
         self.fp = fp
         self.work_path = work_path
         self.zf = ZipFile(self.fp, mode="r")
@@ -17,6 +18,7 @@ class ExtractFile(object):
         self.progress = progress
         self.uncompress_size = sum((f.file_size for f in self.zf.infolist()))
         self.show_info = show_info
+        self.eu_text = eu_text
 
     def clean_work_path(self):
         if os.path.exists(self.work_path):
@@ -33,6 +35,11 @@ class ExtractFile(object):
             if not self.regex_util or not self.regex_util.do_match(spit_filename(zip_info.filename, True)):
                 if len(zip_info.filename) + len(self.work_path) + 1 < 255:
                     self.zf.extract(zip_info.filename, self.work_path)
+                    if self.eu_text and spit_filename(zip_info.filename, True) == "important.properties":
+                        file_path = os.path.join(self.work_path, zip_info.filename)
+                        cf = MyConfigParser(file_path)
+                        regrex = ["\$\{" + key + "\}" for key in cf.keys()]
+                        self.eu_text.add_regex(regrex)
                     if self.show_info:
                         self.update_extract(total)
                 else:

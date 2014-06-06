@@ -30,16 +30,15 @@ class VerifyFile(object):
         root_ef.extract()
 
     def analyze_file(self, file_path):
-        f = open(file_path)
-        line_num = 0
-        for line in f:
-            line = line.strip()
-            line_num += 1
-            if not self.eu_text.do_match(line):
-                res = self.search_regex.do_search(line)
-                if None != res:
-                    self.show_info(file_path=file_path, line_num=line_num, line=line, matcher=res)
-        f.close()
+        with open(file_path) as f:
+            line_num = 0
+            for line in f:
+                line = line.strip()
+                line_num += 1
+                if not self.eu_text.do_match(line):
+                    res = self.search_regex.do_search(line)
+                    if res and not self.eu_text.do_match(res):
+                        self.show_info(file_path=file_path, line_num=line_num, line=line, matcher=res)
 
     def show_info(self, file_path, line_num, line, matcher):
         if self.analyze_info:
@@ -55,7 +54,8 @@ class VerifyFile(object):
             self.analyze_info.finish_verify(fp=self.zip_file_path)
 
     def make_extract(self, zip_file_path, work_path):
-        return ExtractFile(zip_file_path, work_path, self.eu_file, self.show_extract_progress, self.extract_progress)
+        return ExtractFile(zip_file_path, work_path, self.eu_file, self.show_extract_progress, self.extract_progress,
+                           eu_text=self.eu_text)
 
     def __walk(self, file_path):
         if not self.is_extract_root:

@@ -74,13 +74,13 @@ class MyQTextBrowser(QsciScintilla):
             self.item = item
             self.__open_file()
             if item.childCount() == 0:
-                parent = item.getParent()
+                parent = item.parent()
             else:
                 parent = item
             self.markerDeleteAll()
             for child_item in parent.get_children():
                 self.markerAdd(child_item.line_num - 1, self.ARROW_MARKER_NUM)
-
+        self.setFirstVisibleLine(item.line_num)
 
     def __open_file(self):
         html = self.html_mapper.get(self.fp)
