@@ -58,10 +58,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="config_path">
-          <property name="cursor">
-           <cursorShape>PointingHandCursor</cursorShape>
-          </property>
+         <widget class="QPushButton" name="config_path">
           <property name="acceptDrops">
            <bool>false</bool>
           </property>

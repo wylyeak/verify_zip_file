@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow.ui'
 #
-# Created: Thu Jun 05 18:06:36 2014
+# Created: Fri Jun 06 11:31:57 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -48,8 +48,7 @@ class Ui_main_window(object):
         self.zip_path.setAcceptDrops(True)
         self.zip_path.setObjectName(_fromUtf8("zip_path"))
         self.horizontal_layout.addWidget(self.zip_path)
-        self.config_path = QtGui.QLabel(self.central_widget)
-        self.config_path.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.config_path = QtGui.QPushButton(self.central_widget)
         self.config_path.setAcceptDrops(False)
         self.config_path.setObjectName(_fromUtf8("config_path"))
         self.horizontal_layout.addWidget(self.config_path)

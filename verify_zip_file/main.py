@@ -80,6 +80,7 @@ class MainWindow(QtGui.QMainWindow, IExtractShow, IVerifyFileShow):
         self.ui.start_button.clicked.connect(self.__start_verify)
         self.flag = False
         self.vf = None
+        self.ui.config_path.clicked.connect(self.change_config)
         self.analyze_info = GUIVerifyFileShow()
         self.analyze_info.show_info_signal.connect(self.show_info)
         self.analyze_info.finish_verify_signal.connect(self.finish_verify)
@@ -100,20 +101,21 @@ class MainWindow(QtGui.QMainWindow, IExtractShow, IVerifyFileShow):
         self.config_path = None
         self.__init_settings()
 
+    def change_config(self):
+        f_name = QtGui.QFileDialog.getOpenFileNameAndFilter(self.ui.central_widget, u"选择一个文件", os.path.curdir,
+                                                            "*.ini")
+        if f_name[0]:
+            self.__set_config_path(unicode(f_name[0]))
+
     def text_changed(self, text):
         if self.ui.work_path.text() == text:
             pass
         else:
             text = unicode(text)
             if os.path.isfile(text):
-                config_path = self.setting.get_file_config_path(spit_filename(text, True))
-                if config_path:
-                    self.__set_config_path(config_path)
-                else:
-                    pass
+                self.__set_config_path(self.setting.get_file_config_path(spit_filename(text, True)))
             else:
-                pass
-            pass
+                self.__show_status_msg(u"ZIP文件路径错误")
 
     def __set_config_path(self, config_path):
         if config_path and os.path.isfile(config_path):
@@ -186,7 +188,12 @@ class MainWindow(QtGui.QMainWindow, IExtractShow, IVerifyFileShow):
         if item and item.leaf:
             text = spit_filename(item.file_path, True)
         text, ok = self.__make_input_dialog(u"排除文件", u"正则表达式写法", text)
-        print text, ok
+        text = str(text).strip()
+        if ok and self.vf and text != "":
+            self.vf.eu_file.add_regex(text)
+            self.__show_status_msg(u"添加排除文件成功")
+        else:
+            self.__show_status_msg(u"添加排除文件失败")
 
     def exclude_txt(self):
         item = self.ui.tree_view.currentItem()
@@ -194,7 +201,11 @@ class MainWindow(QtGui.QMainWindow, IExtractShow, IVerifyFileShow):
         if item and item.leaf:
             text = item.matcher
         text, ok = self.__make_input_dialog(u"排除字符", u"正则表达式写法", text)
-        print text, ok
+        if ok and self.vf and text != "":
+            self.vf.eu_text.add_regex(text)
+            self.__show_status_msg(u"添加排除文本成功")
+        else:
+            self.__show_status_msg(u"添加排除文本失败")
 
     def __make_input_dialog(self, title, tip, default):
         dialog = QtGui.QInputDialog(self.ui.central_widget)
@@ -213,7 +224,18 @@ class MainWindow(QtGui.QMainWindow, IExtractShow, IVerifyFileShow):
             self.ui.text_view.select_anchor(item)
 
     def __validate(self):
-        self.ui
+        zip_path = unicode(self.ui.zip_path.text())
+        if not os.path.isfile(zip_path):
+            self.__show_status_msg(u"ZIP文件不对")
+            return False
+        work_path = unicode(self.ui.work_path.text())
+        if not os.path.isdir(work_path):
+            self.__show_status_msg(u"解压路径不对")
+            return False
+        config_path = unicode(self.config_path)
+        if not os.path.isfile(config_path):
+            self.__show_status_msg(u"配置文件不对")
+            return False
         return True
 
     def __start_verify(self):
@@ -221,7 +243,9 @@ class MainWindow(QtGui.QMainWindow, IExtractShow, IVerifyFileShow):
             if self.__validate():
                 self.flag = True
                 self.ui.tree_view.clear()
-                self.vf = VerifyFile(str(self.ui.zip_path.text()), str(self.ui.work_path.text()), "config.ini", True,
+                self.vf = VerifyFile(unicode(self.ui.zip_path.text()), unicode(self.ui.work_path.text()),
+                                     unicode(self.config_path),
+                                     True,
                                      self.analyze_info, self.extract_progress)
                 thread = Thread(target=self.vf.walk)
                 thread.setDaemon(True)
