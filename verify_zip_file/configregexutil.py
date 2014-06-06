@@ -24,7 +24,6 @@ class ConfigRegexUtil(object):
                 key = self.section + "_" + str(time())
                 self.cf[self.section][key] = regex
                 sleep(0.1)
-                print key, regex
         if flag:
             self.__save_config()
             self.__make_regex()
