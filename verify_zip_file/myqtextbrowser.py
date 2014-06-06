@@ -81,6 +81,8 @@ class MyQTextBrowser(QsciScintilla):
             for child_item in parent.get_children():
                 self.markerAdd(child_item.line_num - 1, self.ARROW_MARKER_NUM)
         self.ensureLineVisible(item.line_num - 1)
+        self.setCursorPosition(item.line_num - 1, 0)
+        self.ensureCursorVisible()
 
     def __open_file(self):
         html = self.html_mapper.get(self.fp)
