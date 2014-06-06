@@ -7,6 +7,7 @@ def spit_ext(file_name):
 
 
 def spit_filename(file_name, ext_flag=False):
+    file_name = os.path.normpath(str(file_name))
     if ext_flag:
         return os.path.basename(file_name)
     else:

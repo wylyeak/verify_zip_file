@@ -97,6 +97,8 @@ class MainWindow(QtGui.QMainWindow, IExtractShow, IVerifyFileShow):
         exclude_txt_action = QtGui.QAction(u"排除字符", self.ui.tree_view)
         exclude_txt_action.triggered.connect(self.exclude_txt)
         self.ui.tree_view.addAction(exclude_txt_action)
+        self.ui.tree_view.header().setResizeMode(QtGui.QHeaderView.ResizeToContents)
+        self.ui.tree_view.header().setStretchLastSection(True)
         self.setting = None
         self.config_path = None
         self.__init_settings()
@@ -111,7 +113,6 @@ class MainWindow(QtGui.QMainWindow, IExtractShow, IVerifyFileShow):
         if self.ui.work_path.text() == text:
             pass
         else:
-            text = unicode(text)
             if os.path.isfile(text):
                 self.__set_config_path(self.setting.get_file_config_path(spit_filename(text, True)))
             else:
@@ -123,7 +124,8 @@ class MainWindow(QtGui.QMainWindow, IExtractShow, IVerifyFileShow):
             self.config_path = config_path
             self.__show_status_msg(u"配置文件已自动加载为：" + spit_filename(config_path, True))
         else:
-            self.__show_status_msg(config_path + u"不存在")
+            if config_path:
+                self.__show_status_msg(config_path + u"不存在")
             self.__set_config_path(self.setting.get_default_config())
 
     def __init_settings(self):
@@ -138,6 +140,7 @@ class MainWindow(QtGui.QMainWindow, IExtractShow, IVerifyFileShow):
     def show_info(self, kv_args):
         line_num = kv_args["line_num"]
         relative_file_path = kv_args["relative_file_path"]
+        print relative_file_path
         dir_nodes = list(relative_file_path.split(os.sep))
         dir_nodes.append(str(line_num))
         parent = self.model
@@ -155,9 +158,9 @@ class MainWindow(QtGui.QMainWindow, IExtractShow, IVerifyFileShow):
                 tmp = MyItem(kv_args, dir_node, tmp_parent)
                 if index + 1 == total:
                     tmp.setText(0, parent.key)
-                    tmp.setText(1, unicode(dir_node))
+                    tmp.setText(1, dir_node)
                 else:
-                    tmp.setText(0, unicode(dir_node))
+                    tmp.setText(0, dir_node)
                 if index + 2 >= total:
                     tmp.leaf = True
                 parent.add_child(tmp)
@@ -222,6 +225,8 @@ class MainWindow(QtGui.QMainWindow, IExtractShow, IVerifyFileShow):
         item = self.ui.tree_view.currentItem()
         if item and item.leaf:
             self.ui.text_view.select_anchor(item)
+            if item.childCount() == 0:
+                self.__show_status_msg(unicode(item.matcher))
 
     def __validate(self):
         zip_path = unicode(self.ui.zip_path.text())

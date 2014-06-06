@@ -43,7 +43,6 @@ class XMLHighlighter(QtGui.QSyntaxHighlighter):
         index = expression.indexIn(text)
         while index >= 0:
             length = expression.matchedLength()
-            print text[index:index + length]
             line_num_format = QtGui.QTextCharFormat()
             line_num_format.setAnchor(True)
             line_num_format.setAnchorHref("#page_" + str(line_num))
