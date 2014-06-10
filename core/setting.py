@@ -29,7 +29,7 @@ class Setting(object):
 
 
 if __name__ == "__main__":
-    settings = Setting("setting.ini")
+    settings = Setting("../config/setting.ini")
     assert None == settings.get_file_config_path("123123123-www.google.com.hk-2123123123.zip")
     settings.set_config_mapper("www.google.com.hk", "config1.ini")
     assert "config1.ini" == settings.get_file_config_path("123123123-www.google.com.hk-2123123123.zip")

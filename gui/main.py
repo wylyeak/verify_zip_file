@@ -5,10 +5,10 @@ from threading import Thread
 from PyQt4 import QtGui, QtCore
 
 from mainwindow import Ui_main_window
-from extractutil import IExtractShow
-from verifyfile import VerifyFile, IVerifyFileShow
-from util import *
-from setting import *
+from core.extractutil import IExtractShow
+from core.verifyfile import VerifyFile, IVerifyFileShow
+from core.util import *
+from core.setting import *
 
 
 class GUIVerifyFileShow(QtCore.QObject, IVerifyFileShow):
@@ -118,21 +118,28 @@ class MainWindow(QtGui.QMainWindow, IExtractShow, IVerifyFileShow):
             else:
                 self.__show_status_msg(u"ZIP文件路径错误")
 
-    def __set_config_path(self, config_path):
+    def __set_config_path(self, config_path, show=True):
+        if config_path and not os.path.isabs(config_path):
+            config_path = os.path.join("..", "config", config_path)
         if config_path and os.path.isfile(config_path):
             self.ui.config_path.setText(spit_filename(config_path, True))
             self.config_path = config_path
-            self.__show_status_msg(u"配置文件已自动加载为：" + spit_filename(config_path, True))
+            if show:
+                self.__show_status_msg(u"配置文件已自动加载为：" + spit_filename(config_path, True))
         else:
             if config_path:
                 self.__show_status_msg(config_path + u"不存在")
-            self.__set_config_path(self.setting.get_default_config())
+            self.__set_config_path(self.setting.get_default_config(), False)
+            self.__show_status_msg(u"未配置专属配置文件，加载默认配置文件config.ini")
 
     def __init_settings(self):
-        if os.path.isfile("setting.ini"):
-            self.setting = Setting("setting.ini")
+        setting_path = ".." + os.sep + "config" + os.sep + "setting.ini"
+        if os.path.isfile(setting_path):
+            self.setting = Setting(setting_path)
             self.ui.work_path.setText(unicode(self.setting.get_work_path()))
             self.__set_config_path(self.setting.get_default_config())
+        else:
+            self.__show_status_msg("未找到setting.ini文件")
 
     def __show_status_msg(self, msg):
         self.ui.status_bar.showMessage(unicode(msg))

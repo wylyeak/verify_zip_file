@@ -16,7 +16,7 @@ class MyConfigParser(ConfigObj):
 
 
 if __name__ == "__main__":
-    cf = MyConfigParser("config.ini")
+    cf = MyConfigParser("../config/config.ini")
     print cf.get("123")
     print cf.get("exclude_txt")
     for section in cf.sections:

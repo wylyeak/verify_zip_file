@@ -80,7 +80,7 @@ class ConfigRegexUtil(object):
 
 
 if __name__ == "__main__":
-    cf = MyConfigParser("config.ini", encoding="UTF-8")
+    cf = MyConfigParser("../config/config.ini", encoding="UTF-8")
     eu_file = ConfigRegexUtil(cf, "exclude_file")
     eu_text = ConfigRegexUtil(cf, "exclude_txt")
     search_regex = ConfigRegexUtil(cf, "search_regex")
