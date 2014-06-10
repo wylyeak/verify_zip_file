@@ -1,12 +1,11 @@
 __author__ = 'jervyshi'
 import os
 
-import fileUtil
-
 from flask import Flask, request, session, g, redirect, url_for, \
      abort, render_template, flash, jsonify
 from werkzeug.utils import secure_filename
 from verify_zip_file import verifyfile
+from fileUtil import FileUtil
 
 ALLOWED_EXTENSIONS = set(['zip', 'war'])
 UPLOAD_FOLDER = '/export/data/verify/upload/'
@@ -26,7 +25,7 @@ def allowed_file(file_name):
 
 @app.route('/')
 def index():
-    f = fileUtil.get_all_file(app.config['UPLOAD_FOLDER'])
+    f = FileUtil.get_all_file(app.config['UPLOAD_FOLDER'])
     return render_template('index.html', files=f)
 
 
@@ -52,6 +51,15 @@ def verify(name):
 def detail(name):
     print name
     pass
+
+
+@app.route('/status/<name>')
+def status(name):
+    data = dict()
+    data['name'] = name
+    data['complete'] = FileUtil.is_exists(RESULT_FOLDER + FileUtil.spit_filename(name) + '.log')
+    data['verify'] = FileUtil.is_exists(WORK_FOLDER + FileUtil.spit_filename(name))
+    return jsonify(result=data)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

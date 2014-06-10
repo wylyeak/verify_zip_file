@@ -30,9 +30,11 @@
     </div>
     {% endblock %}
     {% block body %}{% endblock %}
-    {% block js %}
+    {% block commonjs %}
     <script src="{{ url_for('static', filename='js/jquery.min.js') }}" type="text/javascript" charset="utf-8"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}" type="text/javascript" charset="utf-8"></script>
+    {% endblock %}
+    {% block js %}
     {% endblock %}
 </body>
 </html>
