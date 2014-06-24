@@ -37,9 +37,13 @@ class ExtractFile(object):
                     self.zf.extract(zip_info.filename, self.work_path)
                     if self.eu_text and spit_filename(zip_info.filename, True) == "important.properties":
                         file_path = os.path.join(self.work_path, zip_info.filename)
-                        cf = MyConfigParser(file_path)
-                        regrex = ["\$\{" + key + "\}" for key in cf.keys()]
-                        self.eu_text.add_regex(regrex)
+                        try:
+                            cf = MyConfigParser(file_path, file_error=True)
+                            regrex = ["\$\{" + key + "\}" for key in cf.keys()]
+                            self.eu_text.add_regex(regrex)
+                        except Exception as exe:
+                            print exe
+                            print self.work_path + "/" + zip_info.filename
                     if self.show_info:
                         self.update_extract(total)
                 else:
