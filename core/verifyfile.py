@@ -49,9 +49,12 @@ class VerifyFile(object):
             print file_path, line_num, line, matcher
 
     def walk(self):
-        self.__walk(self.work_path)
-        if self.analyze_info:
-            self.analyze_info.finish_verify(fp=self.zip_file_path)
+        try:
+            self.__walk(self.work_path)
+            if self.analyze_info:
+                self.analyze_info.finish_verify(fp=self.zip_file_path)
+        except Exception, e:
+            print e
 
     def make_extract(self, zip_file_path, work_path):
         return ExtractFile(zip_file_path, work_path, self.eu_file, self.show_extract_progress, self.extract_progress,
